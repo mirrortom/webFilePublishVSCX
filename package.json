@@ -1,0 +1,87 @@
+{
+  "name": "webPublishVSCX",
+  "displayName": "WebFilePublishVSCX",
+  "description": "publish web file extension for vscode",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "cmd.PublishActiveFile",
+        "title": "发布当前文件"
+      },
+      {
+        "command": "cmd.PublishDir",
+        "title": "发布选中目录(使用右键)"
+      },
+      {
+        "command": "cmd.PublishFile",
+        "title": "发布选中文件(使用右键)"
+      },
+      {
+        "command": "cmd.PublishWeb",
+        "title": "发布整个工作区"
+      }
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "cmd.PublishDir",
+          "group": "navigation"
+        },
+        {
+          "command": "cmd.PublishFile",
+          "group": "navigation"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "cmd.PublishActiveFile",
+        "key": "alt+q alt+q"
+      },
+      {
+        "command": "cmd.PublishWeb",
+        "key": "alt+3 alt+3"
+      },
+      {
+        "command": "cmd.PublishDir",
+        "key": "alt+2 alt+2"
+      },
+      {
+        "command": "cmd.PublishFile",
+        "key": "alt+1 alt+1"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.6",
+    "@types/node": "18.x",
+    "@types/vscode": "^1.90.0",
+    "@typescript-eslint/eslint-plugin": "^7.11.0",
+    "@typescript-eslint/parser": "^7.11.0",
+    "@vscode/test-cli": "^0.0.9",
+    "@vscode/test-electron": "^2.4.0",
+    "eslint": "^8.57.0",
+    "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "json5": "^2.2.3",
+    "promise-socket": "^7.0.0"
+  }
+}
