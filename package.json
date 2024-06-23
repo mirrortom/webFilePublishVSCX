@@ -3,6 +3,10 @@
   "displayName": "WebFilePublishVSCX",
   "description": "publish web file extension for vscode",
   "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mirrortom/webFilePublishVSCX.git"
+  },
   "engines": {
     "vscode": "^1.90.0"
   },
@@ -81,6 +85,7 @@
     "typescript": "^5.4.5"
   },
   "dependencies": {
+    "@vscode/vsce": "^2.29.0",
     "json5": "^2.2.3",
     "promise-socket": "^7.0.0"
   }

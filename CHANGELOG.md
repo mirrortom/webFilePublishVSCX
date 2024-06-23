@@ -1,9 +1,6 @@
 # Change Log
-
-All notable changes to the "vscexthelloworld" extension will be documented in this file.
-
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
 ## [Unreleased]
 
-- Initial release
+- 2024/06/23 首次打包,生成vsix文件,安装成功.
