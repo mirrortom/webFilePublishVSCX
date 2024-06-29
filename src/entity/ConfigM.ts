@@ -4,8 +4,10 @@ import JSON5 from 'json5';
 
 import { EnvVar } from "../helpers/EnvVar";
 import { StringBuilder } from "../helpers/LikeCS";
-import CmdContext from "./CmdContext";
+import CmdContext from "../publish/CmdContext";
 import Help from '../helpers/Help';
+import BundleM from './BundleM';
+import StylusM from './StylusM';
 
 export default class ConfigM {
     /**服务地址 */
@@ -30,7 +32,7 @@ export default class ConfigM {
     MiniOutput: number = 7;
 
     /** 不允许发布的文件(例如:bundleconfig.json data/data.mdb 相对路径的文件名,相对于项目根目录)*/
-    DenyFiles: string[] = ["tscofnig.json","package-lock.json","package.json","bundleconfig.json","compilerconfig.json"];
+    DenyFiles: string[] = ["tscofnig.json", "package-lock.json", "package.json", "bundleconfig.json", "compilerconfig.json"];
 
     /** 不允许发布的目录(例如:cfg 相对路径,相对于项目根目录)*/
     DenyDirs: string[] = [];
@@ -41,14 +43,20 @@ export default class ConfigM {
     /** razor model数据*/
     RazorModel: any = {};
 
+    /** 文件合并*/
+    Bundle: BundleM[] | null = null;
+
+    /** stylus编译 */
+    Stylus: StylusM[] | null = null;
+
     /**
      * 根据发布配置文件生成发布配置对象.配置文件publish.json放在项目根目录下.
     如果没有配置文件,将使用默认配置,并在项目根目录下生成publish.json配置文件
     如果指定的配置文件不是有效的json,返回出错提示.
     如果配置文件的值无效,将置为默认值.
-    失败时cmdContext.CfgM=null
+    失败时返回null
     */
-    static CreatePublishCfg(cmdContext: CmdContext): void {
+    static CreatePublishCfg(): ConfigM | null {
         try {
             let cfgPath = Path.join(EnvVar.wsDir, EnvVar.PublishCfgName);
 
@@ -56,16 +64,14 @@ export default class ConfigM {
             if (!fs.existsSync(cfgPath)) {
                 var cfg = new ConfigM();
                 fs.writeFileSync(cfgPath, ConfigM.CreateJson(cfg), { encoding: 'utf8' });
-                cmdContext.CfgM = cfg;
-                return;
+                return cfg;
             }
             // 已有
             let cfgjson = JSON5.parse(fs.readFileSync(cfgPath, { encoding: 'utf8' }));
-            cmdContext.CfgM = Help.JsonToTsObject(ConfigM, cfgjson);
+            return Help.JsonToTsObject(ConfigM, cfgjson);
         }
         catch (e: any) {
-            cmdContext.Info.AppendLine(`publish.json生成失败,发布已停止! 异常消息: ${e.message}`);
-            cmdContext.CfgM = null;
+            return null;
         }
     }
 
@@ -112,7 +118,13 @@ export default class ConfigM {
         sb.AppendLine(`  "razorSearchDirs": [],`);
 
         sb.AppendLine("  // razor model数据,一个json键值对例如{ name : 'mirror' , ... },将作为dynamic对象作为Model传给cshtml文件,调用方法@Model.name");
-        sb.AppendLine(`  "razorModel": {}`);
+        sb.AppendLine(`  "razorModel": {},`);
+
+        sb.AppendLine("  // 文件合并,全路径或相对于项目根目录 [{inputFiles:[输入文件数组],outputFile:输出文件}]");
+        sb.AppendLine(`  "bundle": null,`);
+
+        sb.AppendLine("  // 编译stylus文件,全路径或相对于项目根目录[{inputFile:要编译的styl文件,outputFile:css输出文件}]");
+        sb.AppendLine(`  "stylus": null`);
 
         sb.AppendLine("}");
         return sb.ToString();

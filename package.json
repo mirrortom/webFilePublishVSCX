@@ -13,7 +13,9 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "workspaceContains:*"
+  ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
@@ -32,17 +34,48 @@
       {
         "command": "cmd.PublishWeb",
         "title": "发布整个工作区"
+      },
+      {
+        "command": "cmd.BundleFiles",
+        "title": "合并文件-全项目内"
+      },
+      {
+        "command": "cmd.CompileStylus",
+        "title": "编译styl文件-全项目内"
       }
     ],
     "menus": {
+      "editor/context": [
+        {
+          "command": "cmd.PublishActiveFile",
+          "when": "resourceScheme == file && resourceFilename != publish.json"
+        }
+      ],
       "explorer/context": [
         {
           "command": "cmd.PublishDir",
-          "group": "navigation"
+          "group": "2_workspace",
+          "when": "explorerResourceIsFolder"
         },
         {
           "command": "cmd.PublishFile",
-          "group": "navigation"
+          "group": "2_workspace",
+          "when": "resourceScheme == file && resourceFilename != publish.json"
+        },
+        {
+          "command": "cmd.PublishWeb",
+          "group": "2_workspace",
+          "when": "resourceFilename == publish.json"
+        },
+        {
+          "command": "cmd.CompileStylus",
+          "group": "2_workspace",
+          "when": "resourceFilename == publish.json"
+        },
+        {
+          "command": "cmd.BundleFiles",
+          "group": "2_workspace",
+          "when": "resourceFilename == publish.json"
         }
       ]
     },
@@ -62,6 +95,14 @@
       {
         "command": "cmd.PublishFile",
         "key": "alt+1 alt+1"
+      },
+      {
+        "command": "cmd.BundleFiles",
+        "key": "alt+4 alt+4"
+      },
+      {
+        "command": "cmd.CompileStylus",
+        "key": "alt+5 alt+5"
       }
     ]
   },
@@ -76,17 +117,19 @@
   "devDependencies": {
     "@types/mocha": "^10.0.6",
     "@types/node": "18.x",
+    "@types/stylus": "^0.48.42",
     "@types/vscode": "^1.90.0",
     "@typescript-eslint/eslint-plugin": "^7.11.0",
     "@typescript-eslint/parser": "^7.11.0",
     "@vscode/test-cli": "^0.0.9",
     "@vscode/test-electron": "^2.4.0",
+    "@vscode/vsce": "^2.29.0",
     "eslint": "^8.57.0",
     "typescript": "^5.4.5"
   },
   "dependencies": {
-    "@vscode/vsce": "^2.29.0",
     "json5": "^2.2.3",
-    "promise-socket": "^7.0.0"
+    "promise-socket": "^7.0.0",
+    "stylus": "^0.63.0"
   }
 }

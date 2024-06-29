@@ -1,6 +1,6 @@
 import { CmdTypes } from '../helpers/EnvVar';
 import { StringBuilder } from '../helpers/LikeCS';
-import ConfigM from './ConfigM';
+import ConfigM from '../entity/ConfigM';
 
 // 命令工作数据对象,在命令开始时建立
 export default class CmdContext {

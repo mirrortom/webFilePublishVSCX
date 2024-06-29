@@ -12,5 +12,7 @@ export enum CmdTypes {
     PublishActiveFile,
     PublishFile,
     PublishDir,
-    PublishWeb
+    PublishWeb,
+    BundleFiles,
+    CompileStylus
 }

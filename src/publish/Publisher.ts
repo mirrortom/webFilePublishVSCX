@@ -6,7 +6,7 @@ import PromiseSocket from 'promise-socket';
 import { CmdTypes, EnvVar } from "../helpers/EnvVar";
 import CmdContext from "./CmdContext";
 import ProjectHelpers from "../helpers/ProjectHelpers";
-import ConfigM from "./ConfigM";
+import ConfigM from "../entity/ConfigM";
 import Help from '../helpers/Help';
 import VscOutPutWindow from '../helpers/OutPutInfo';
 
@@ -15,7 +15,7 @@ export default class Publisher {
     private readonly cmdcontext: CmdContext;
 
     /**
-     * 在vscode插件中,使用右键菜单发布时,需要设置这个属性,值是右键菜单
+     * 在vscode插件中,使用右键菜单发布时,需要设置这个属性,值是右键菜单选中的条目
      */
     private readonly selectedItems: string[] = [];
 
@@ -38,12 +38,12 @@ export default class Publisher {
         // 1.获取数据
         //// 1.1发布相关基础数据(项目根目录,配置文件等)
         if (!this.GetDataForPublish()) {
-            VscOutPutWindow(this.cmdcontext.Info.ToString(), true);
+            VscOutPutWindow(this.cmdcontext.Info.ToString());
             return;
         }
         //// 1.2要发布的文件
         if (!await this.GetFileToPublish()) {
-            VscOutPutWindow(this.cmdcontext.Info.ToString(), true);
+            VscOutPutWindow(this.cmdcontext.Info.ToString());
             return;
         }
 
@@ -56,7 +56,7 @@ export default class Publisher {
 
         // 4.结果
         this.cmdcontext.Info.AppendLine("END 发布结束<<<".padEnd(50, '-'));
-        VscOutPutWindow(this.cmdcontext.Info.ToString(), true);
+        VscOutPutWindow(this.cmdcontext.Info.ToString());
     }
 
 
@@ -101,13 +101,15 @@ export default class Publisher {
                 }
             }
             this.cmdcontext.SrcFiles = Help.GetAllFiles(dirs);
+        } else {
+            return false;
         }
 
         // 根据发布条件筛选
         this.FilterFiles();
         // 至少要有一个文件发布
         if (this.cmdcontext.SrcFiles.length == 0) {
-            this.cmdcontext.Info.AppendLine("没有可发布的文件,发布已停止!");
+            this.cmdcontext.Info.AppendLine("--没有可发布的文件,发布已停止!");
             return false;
         }
         return true;
@@ -120,20 +122,21 @@ export default class Publisher {
         let rootDir = EnvVar.wsDir
         // 活动项目根路径,最基础数据
         if (rootDir == '') {
-            this.cmdcontext.Info.AppendLine("未选择活动项目,根路径获取失败,发布已停止!");
+            this.cmdcontext.Info.AppendLine("--未选择活动项目,根路径获取失败,发布已停止!");
             return false;
         }
 
         // 获取发布配置文件,必要数据
-        ConfigM.CreatePublishCfg(this.cmdcontext);
+        this.cmdcontext.CfgM = ConfigM.CreatePublishCfg();
         if (this.cmdcontext.CfgM == null) {
+            this.cmdcontext.Info.AppendLine("--publish.json获取失败,发生了异常,发布已停止!");
             return false;
         }
 
         // 如果输出目录是相对目录,需要加上项目根目录,成为全路径
         if (!Path.isAbsolute(this.cmdcontext.CfgM.DistDir)) {
-            this.cmdcontext.CfgM.DistDir = Path.join
-                (rootDir, this.cmdcontext.CfgM.DistDir);
+            this.cmdcontext.CfgM.DistDir = Help.PathSplitChar(
+                Path.join(rootDir, this.cmdcontext.CfgM.DistDir));
         }
 
         // razor页面搜索目录,加上全路径
@@ -291,7 +294,7 @@ export default class Publisher {
             this.cmdcontext.Info.AppendLine(srvmsg);
         }
         catch (e: any) {
-            this.cmdcontext.Info.AppendLine(`RequestServeAsync()异常,请检查插件服务! ${e.message}`);
+            this.cmdcontext.Info.AppendLine(`--RequestServeAsync()异常,请检查插件服务! ${e.message}`);
         }
         finally {
             client.destroy();
