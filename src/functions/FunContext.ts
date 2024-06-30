@@ -7,9 +7,7 @@ export default class FunContext {
     constructor() {
         this.Info = new StringBuilder();
     }
-    /** 保存时的目标文件(全路径) */
-    targetFile: string | null = null;
-
+   
     /**命令类型*/
     CmdType: CmdTypes | null = null;
 

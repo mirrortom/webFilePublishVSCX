@@ -157,12 +157,11 @@ export default class Publisher {
         let files: string[] = [];
         // 此时的发布目录DistDir,必须已经是全路径
         let outDirLower = Help.PathSplitChar(this.cmdcontext.CfgM.DistDir).toLowerCase();
-        let jsonCfgPathLower = Help.PathSplitChar(Path.join(EnvVar.wsDir, EnvVar.PublishCfgName)).toLowerCase();
 
         // 循环所有文件,筛选
         for (let i = 0; i < this.cmdcontext.SrcFiles.length; i++) {
             const item = this.cmdcontext.SrcFiles[i];
-            let filePathLower: string = Help.PathSplitChar(item).toLowerCase();
+            let filePathLower = Help.PathSplitChar(item).toLowerCase();
             // 如果文件位于发布目录下要排除掉.避免发布"发布目录里的文件".
             // 例如发布目录是默认值dist时,这是位于项目根目录下的dist文件夹,如果意外被包含进项目,就会发生此情况
             if (filePathLower.startsWith(outDirLower))
@@ -185,7 +184,7 @@ export default class Publisher {
                 continue;
 
             // 不发布配置文件
-            if (filePathLower == jsonCfgPathLower)
+            if (ProjectHelpers.IsPublishJsonPath(filePathLower))
                 continue;
             //
             files.push(Help.PathSplitChar(item));

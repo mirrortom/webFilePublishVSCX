@@ -9,8 +9,9 @@ declare global {
         TrimEnd(chars: string): string;
     }
 }
+
 /**
-* 去除开头结尾处指定字符,默认空格字符
+* 去除开头结尾处指定字符
 * @param str 
 * @param char 
 * @returns 
@@ -73,4 +74,6 @@ export class StringBuilder {
         return this.buffer.join('');
     }
 }
+// 请注意，export {} 不导出空对象 - 它是一个不导出任何内容的无操作声明（空名称列表）。
+// https://web.nodejs.cn/en-us/docs/web/javascript/reference/statements/export/
 export { }

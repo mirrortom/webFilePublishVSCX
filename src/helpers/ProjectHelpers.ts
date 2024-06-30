@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import Path from 'path';
 import { EnvVar } from './EnvVar';
+import Help from './Help';
 
 /** 获取项目内资源*/
 export default class ProjectHelpers {
@@ -74,5 +75,14 @@ export default class ProjectHelpers {
             return true;
         }
         return false;
+    }
+
+    /**
+     * 判断路径是否为配置文件(publish.json)
+     */
+    static IsPublishJsonPath(targetFile: string): boolean {
+        let jsonCfgPathLower = Help.PathSplitChar(Path.join(EnvVar.wsDir, EnvVar.PublishCfgName)).toLowerCase();
+        let target = Help.PathSplitChar(targetFile).toLowerCase();
+        return target == jsonCfgPathLower;
     }
 }

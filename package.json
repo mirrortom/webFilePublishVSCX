@@ -2,7 +2,7 @@
   "name": "webPublishVSCX",
   "displayName": "WebFilePublishVSCX",
   "description": "publish web file extension for vscode",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "repository": {
     "type": "git",
     "url": "https://github.com/mirrortom/webFilePublishVSCX.git"
@@ -42,6 +42,10 @@
       {
         "command": "cmd.CompileStylus",
         "title": "编译styl文件-全项目内"
+      },
+      {
+        "command": "cmd.CompileStylFile",
+        "title": "编译styl文件(使用右键)"
       }
     ],
     "menus": {
@@ -71,6 +75,11 @@
           "command": "cmd.CompileStylus",
           "group": "2_workspace",
           "when": "resourceFilename == publish.json"
+        },
+        {
+          "command": "cmd.CompileStylFile",
+          "group": "2_workspace",
+          "when": "resourceExtname == .styl"
         },
         {
           "command": "cmd.BundleFiles",

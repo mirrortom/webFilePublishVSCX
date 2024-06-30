@@ -20,6 +20,8 @@ export function regeFuns(context: vscode.ExtensionContext) {
         { name: "cmd.BundleFiles", fun: bundleByCfg },
         // 2.编译stylus文件,根据配置文件(alt+5 5)
         { name: "cmd.CompileStylus", fun: stylusByCfg },
+        // 3.编译单个styl文件,右键(资源管理器)
+        { name: "cmd.CompileStylFile", fun: stylusCompileFile }
     ];
     for (let i = 0; i < cmds.length; i++) {
         const cmd = cmds[i];
@@ -32,5 +34,16 @@ async function bundleByCfg() {
 }
 async function stylusByCfg() {
     await new FunManager().ExecFun(CmdTypes.CompileStylus);
+}
+async function stylusCompileFile(contextSelection: vscode.Uri, allSelections: vscode.Uri[]) {
+    if (allSelections) {
+        let selectedItems: string[] = [];
+        for (let index = 0; index < allSelections.length; index++) {
+            selectedItems.push(allSelections[index].fsPath)
+            //console.log(index + ' :' + item.fsPath);
+        }
+        // 执行任务
+        await new FunManager().CompileStylFile(selectedItems);
+    }
 }
 
