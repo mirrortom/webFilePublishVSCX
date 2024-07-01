@@ -8,11 +8,8 @@ import { CmdTypes } from '../helpers/EnvVar';
  * @param context 
  */
 export function regeFuns(context: vscode.ExtensionContext) {
-    let disposable1 = vscode.workspace.onDidSaveTextDocument(async (listener: vscode.TextDocument) => {
-        if (!listener) return;
-        await new FunManager().RunOnSaveAsync(listener.uri.fsPath);
-    })
-    context.subscriptions.push(disposable1);
+    // onsave事件
+    context.subscriptions.push(vscode.workspace.onDidSaveTextDocument(onDidSaveTextDocumentHandler));
 
     // 整个项目内的,合并文件和编译stylus,做成命令绑定快捷键.根据配置文件的设定执行.
     let cmds = [
@@ -27,6 +24,11 @@ export function regeFuns(context: vscode.ExtensionContext) {
         const cmd = cmds[i];
         context.subscriptions.push(vscode.commands.registerCommand(cmd.name, cmd.fun));
     }
+}
+
+async function onDidSaveTextDocumentHandler(listener: vscode.TextDocument) {
+    if (!listener) return;
+    await new FunManager().RunOnSaveAsync(listener.uri.fsPath);
 }
 
 async function bundleByCfg() {

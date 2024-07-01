@@ -1,5 +1,6 @@
 import os from 'os';
-import * as fs from 'fs';
+import * as fsSync from 'fs';
+import * as fs from 'fs/promises';
 import Path from 'path';
 import * as Stream from 'stream/promises';
 
@@ -16,22 +17,27 @@ export default class BundleFun {
     static async ExecOnSave(context: FunContext, targetFile: string) {
         if (BundleFun.cfgCheck(context) == false)
             return;
-        // 检查该文件是否在配置文件中bundle节inputFiles数组中,如果存在就合并.
         let targetLower = Help.PathSplitChar(targetFile).toLowerCase();
         let cfg = context.CfgM.Bundle;
         BundleFun.pathFull(cfg);
+
+        context.Info.AppendLine('BundleFun: 保存事件--开始执行文件合并...');
         for (let i = 0; i < cfg.length; i++) {
             const item = cfg[i];
-            // target是否在在inputs里
-            item.inputFiles.forEach(async (input) => {
+            let isIn = false;
+            // 检查该文件是否在配置文件中bundle节inputFiles数组中,如果存在就合并.
+            item.inputFiles.forEach((input) => {
                 if (input.toLowerCase() == targetLower) {
-                    // 合并这个
-                    await BundleFun.unionFiles(item.outputFile, item.inputFiles, context);
-                    // 下一项
+                    isIn = true;
                     return;
                 }
             })
+            if (isIn) {
+                // 合并文件.不要到forEach里await,会错误.
+                await BundleFun.unionFiles(item.outputFile, item.inputFiles, context);
+            }
         }
+        context.Info.AppendLine('BundleFun: 保存事件--执行文件合并结束!');
     }
 
     /**
@@ -61,27 +67,26 @@ export default class BundleFun {
         // 检查inputFiles文件是否存在
         for (let i = 0; i < inputFiles.length; i++) {
             const item = inputFiles[i];
-            if (!fs.existsSync(item)) {
+            if (!fsSync.existsSync(item)) {
                 context.Info.AppendLine(`--文件[ ${item} ]不存在.`);
                 return;
             }
         }
-        let sw: fs.WriteStream;
+        let sw: fsSync.WriteStream;
         try {
             // 写入流,是一个目标文件,多个文件将合并到这个文件里
-            sw = fs.createWriteStream(outputFileName, 'utf8');
+            sw = fsSync.createWriteStream(outputFileName);
             // 循环多个文件,读取流,然后写入
             for (let i = 0; i < inputFiles.length; i++) {
                 let item = inputFiles[i];
-                // 读取流
-                let sr = fs.createReadStream(item);
-                // 关键点,使用pipeline管道操作,将读取流写入到写入流
-                // end=false表示管道不关闭,因为还有下一个要写入.就是因为没搞懂这个参数,结果总是报错,说是内存泄漏问题.
-                // 可能是因为,在没有设置end=false时,管道关闭了,然后下次循环时又打开管道,因为是同一个写入流,可能报错.
-                // 设置后就不报错误了.
-                await Stream.pipeline(sr, sw, { end: false });
-                // 源文件读取流关闭
-                sr.close();
+                // 读取到buffer
+                let buffer = await fs.readFile(item);
+                // 检查带bom的utf8
+                if (Help.IsUtf8WithBom(buffer)) {
+                    sw.write(buffer.subarray(3));
+                } else {
+                    sw.write(buffer);
+                }
                 // 每次合并一个文件后,加一个换行.
                 sw.write(os.EOL);
             }
@@ -90,14 +95,6 @@ export default class BundleFun {
             context.Info.AppendLine('--文件合并异常: ' + err.message);
         } finally {
             sw.close();
-            // 最后关闭写入流.这样管道也关闭.pipeline内部有处理
-            // sw.close((err) => {
-            //     if (err) {
-            //         console.log(err);
-            //     } else {
-            //         console.log('sw.close is ok!');
-            //     }
-            // });
         }
     }
 

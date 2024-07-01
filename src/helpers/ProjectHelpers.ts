@@ -85,4 +85,21 @@ export default class ProjectHelpers {
         let target = Help.PathSplitChar(targetFile).toLowerCase();
         return target == jsonCfgPathLower;
     }
+
+    /**
+     * onsave时,检查目标文件的扩展名是否为支持的文件
+     */
+    static targetFileExtNameCheckForOnSave(targetFile: string): boolean {
+        let suppertExt = ['.styl', '.html', '.css', '.js', '.txt'];
+        let extN = Path.extname(targetFile).toLowerCase();
+        return suppertExt.indexOf(extN) >= 0;
+    }
+
+    /**
+     * 检查文件扩展名是否为.styl,用于stylus编译
+     * @param targetFile 
+     */
+    static targetFileExtNameIsStyl(targetFile: string): boolean {
+        return Path.extname(targetFile).toLowerCase() == '.styl';
+    }
 }

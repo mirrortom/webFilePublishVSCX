@@ -25,14 +25,17 @@ export default class FunManager {
      * 按保存时执行所有功能,目标是当前保存的文档
      */
     async RunOnSaveAsync(targetFile: string) {
+        // 支持文件扩展名: .styl(stylus编译),.js/.txt/.css/.html(合并)
+        if (!ProjectHelpers.targetFileExtNameCheckForOnSave(targetFile)) {
+            return;
+        }
         if (ProjectHelpers.IsPublishJsonPath(targetFile)) {
             // 如果是配置文件,不动作
             return;
         }
 
-        this.funcontext.Info.AppendLine('文档保存事件执行...');
         if (this.funcontext.CfgM == null) {
-            VscOutPutWindow('-- publish.json获取失败,发生了异常!');
+            VscOutPutWindow('文件保存事件: publish.json获取失败,发生了异常!');
             return;
         }
         // 2.执行功能

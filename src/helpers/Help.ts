@@ -85,4 +85,9 @@ export default class Help {
         let decode = new TextDecoder();
         return decode.decode(u8arr);
     }
+
+    /**检查从文件读取的buffer,是否为utf8带bom编码 */
+    static IsUtf8WithBom(buffer: Buffer) {
+        return buffer[0] == 239 && buffer[1] == 187 && buffer[2] == 191;
+    }
 }

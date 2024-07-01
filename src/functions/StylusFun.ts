@@ -9,6 +9,7 @@ import FunContext from './FunContext';
 import { EnvVar } from '../helpers/EnvVar';
 import Help from '../helpers/Help';
 import StylusM from '../entity/StylusM';
+import ProjectHelpers from '../helpers/ProjectHelpers';
 
 export default class StylusFun {
 
@@ -21,13 +22,14 @@ export default class StylusFun {
             return;
         let cfg = context.CfgM.Stylus;
         StylusFun.pathFull(cfg);
+        context.Info.AppendLine('StylusFun: 右键菜单--开始编译styl文件...');
         for (let i = 0; i < targets.length; i++) {
             const item = targets[i];
-            let targetLower = Help.PathSplitChar(item).toLowerCase();
-            if (!targetLower.endsWith('.styl'))
+            if (!ProjectHelpers.targetFileExtNameIsStyl(item))
                 continue;
             await StylusFun.CompileFile(item, context);
         }
+        context.Info.AppendLine('StylusFun: 右键菜单--编译styl文件结束!');
     }
 
     /**
@@ -35,14 +37,35 @@ export default class StylusFun {
      * @param context 
      */
     static async ExecOnSave(context: FunContext, targetFile: string) {
-        let targetLower = Help.PathSplitChar(targetFile).toLowerCase();
-        if (!targetLower.endsWith('.styl')) {
+        if (!ProjectHelpers.targetFileExtNameIsStyl(targetFile))
             return;
-        }
         if (StylusFun.cfgCheck(context) == false)
             return;
         StylusFun.pathFull(context.CfgM.Stylus);
+        context.Info.AppendLine('StylusFun: 保存事件--开始编译styl文件...');
         await StylusFun.CompileFile(targetFile, context);
+        context.Info.AppendLine('StylusFun: 保存事件--编译styl文件结束!');
+    }
+
+    /**
+     * 全局执行编译stylus文件,根据配置文件
+     */
+    static async CompileByCfg(context: FunContext) {
+        if (context.CfgM.Stylus == null) {
+            // 没有配置绑定文件,不动作
+            return;
+        }
+        let cfg = context.CfgM.Stylus;
+        // 路径补齐为全路径
+        StylusFun.pathFull(cfg);
+        // 开始编译
+        context.Info.AppendLine('StylusFun: 开始编译全项目styl文件...');
+        for (let i = 0; i < cfg.length; i++) {
+            const item = cfg[i];
+
+            await StylusFun.CompileStylus(item.outputFile, item.inputFile, context);
+        }
+        context.Info.AppendLine('StylusFun: 全项目styl文件编译结束!');
     }
 
     /**
@@ -50,7 +73,7 @@ export default class StylusFun {
      * @param file 
      * @param context 
      */
-    static async CompileFile(targetFile: string, context: FunContext) {
+    private static async CompileFile(targetFile: string, context: FunContext) {
         // 检查文件地址,是否在配置文件中Stylus节inputFile中,存在则编译
         let targetLower = Help.PathSplitChar(targetFile).toLowerCase();
         let cfg = context.CfgM.Stylus;
@@ -76,26 +99,7 @@ export default class StylusFun {
         }
     }
 
-    /**
-     * 全局执行编译stylus文件,根据配置文件
-     */
-    static async CompileByCfg(context: FunContext) {
-        if (context.CfgM.Stylus == null) {
-            // 没有配置绑定文件,不动作
-            return;
-        }
-        let cfg = context.CfgM.Stylus;
-        // 路径补齐为全路径
-        StylusFun.pathFull(cfg);
-        // 开始编译
-        context.Info.AppendLine('StylusFun: 开始编译全项目styl文件...');
-        for (let i = 0; i < cfg.length; i++) {
-            const item = cfg[i];
 
-            await StylusFun.CompileStylus(item.outputFile, item.inputFile, context);
-        }
-        context.Info.AppendLine('StylusFun: 全项目styl文件编译结束!');
-    }
 
     /**
      * 编译stys文件,使用stylus库

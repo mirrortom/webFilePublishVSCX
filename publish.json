@@ -1,0 +1,28 @@
+{
+  // 服务Ip地址 127.0.0.1
+  "ip": "127.0.0.1",
+  // 服务端口 50_015
+  "port": 50015,
+  // 源文件目录名(例如:src 相对路径,相对于项目根目录,这层目录不会发布,例如src/a/a.txt发布后是/a/a.txt)
+  "sourceDir": "src",
+  // 发布目录名(例如: 'dist' 或 'd:/pubdir' 相对路径或绝对路径)
+  "distDir": "dist",
+  // 对js,css,html压缩输出(0=不压缩,7=都压缩. 1=html,2=css,4=js)
+  "miniOutput": "7",
+  // 允许发布的文件扩展名,例: .html(.号开头)
+  "allowExts": [".htm",".html",".cshtml",".config",".js",".css",".json",".jpg",".jpeg",".gif",".png",".bmp",".woff",".woff2",".ttf",".svg",".eot",".otf"],
+  // 不允许发布的文件后缀名
+  "denySuffix": ["layout.cshtml","part.cshtml","part.js","part.css"],
+  // 不允许发布的文件(例如:bundleconfig.json data/data.mdb 相对路径的文件名,相对于项目根目录)
+  "denyFiles": ["tscofnig.json","package-lock.json","package.json","bundleconfig.json","compilerconfig.json"],
+  // 不允许发布的目录(例如:cfg 相对路径,相对于项目根目录)
+  "denyDirs": [],
+  // razor搜索路径(相对路径,相对于项目根目录,razor页面引用的母版页部分页在此目录下查找
+  "razorSearchDirs": [],
+  // razor model数据,一个json键值对例如{ name : 'mirror' , ... },将作为dynamic对象作为Model传给cshtml文件,调用方法@Model.name
+  "razorModel": {},
+  // 文件合并,全路径或相对于项目根目录 [{inputFiles:[输入文件数组],outputFile:输出文件}]
+  "bundle": null,
+  // 编译stylus文件,全路径或相对于项目根目录[{inputFile:要编译的styl文件,outputFile:css输出文件}]
+  "stylus": null
+}
