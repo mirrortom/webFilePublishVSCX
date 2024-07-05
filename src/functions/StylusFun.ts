@@ -190,8 +190,12 @@ export default class StylusFun {
      * @param cfg 
      */
     private static cfgCheck(context: FunContext): boolean {
-        if (context.CfgM.Stylus == null || context.CfgM.Stylus.length == 0) {
+        if (context.CfgM.Stylus == null) {
             context.Info.AppendLine('--缺少配置节Stylus.');
+            return false;
+        }
+        if (!typeof context.CfgM.Stylus.length) {
+            context.Info.AppendLine('--配置节Stylus必须是一个数组,请参考注释说明配置.');
             return false;
         }
         return true;

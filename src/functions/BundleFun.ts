@@ -118,8 +118,12 @@ export default class BundleFun {
      * @param cfg 
      */
     private static cfgCheck(context: FunContext): boolean {
-        if (context.CfgM.Bundle == null || context.CfgM.Bundle.length == 0) {
+        if (context.CfgM.Bundle == null) {
             context.Info.AppendLine('--缺少配置节Bundle.');
+            return false;
+        }
+        if(!typeof context.CfgM.Bundle.length){
+            context.Info.AppendLine('--配置节Bundle必须是一个数组,请参考注释说明配置.');
             return false;
         }
         return true;
